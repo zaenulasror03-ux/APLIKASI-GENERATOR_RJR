@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIAP-GURU SMP - Modul Ajar Generator & Administrasi Guru</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#1e40af',
+              emerald: '#10b981',
+              accent: '#f59e0b',
+              dark: '#0f172a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-area, #print-area * {
+        visibility: visible;
+      }
+      #print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 flex flex-col min-h-screen">
+
+  <!-- Header / Navbar -->
+  <header class="bg-gradient-to-r from-blue-900 via-blue-700 to-emerald-600 text-white shadow-lg sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="p-1.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden flex items-center justify-center w-10 h-10 shrink-0">
+          <img id="header-logo-img" src="" alt="Logo Sekolah" class="hidden w-full h-full object-contain">
+          <i id="header-logo-icon" class="fa-solid fa-graduation-cap text-xl text-amber-400"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-wide flex items-center gap-2">
+            SIAP-GURU SMP 
+            <span class="text-[10px] bg-amber-400 text-blue-950 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">v2.5 Pro</span>
+          </h1>
+          <p class="text-xs text-blue-100" id="header-school">SMPN 8 MATARAM</p>
+        </div>
+      </div>
+      <div class="text-right text-xs hidden md:block">
+        <p class="font-semibold text-amber-300" id="header-teacher">NUNIK, S.Pd.</p>
+        <p class="text-blue-100" id="header-subject">Mata Pelajaran: IPA</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+    <!-- Sidebar Navigation -->
+    <aside class="lg:col-span-1 bg-white rounded-2xl shadow-sm p-4 h-fit border border-slate-200/80 no-print">
+      <h2 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Menu Utama</h2>
+      <nav class="space-y-1.5">
+        <button onclick="switchTab('modul-generator')" class="tab-btn active-tab w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition">
+          <span class="flex items-center space-x-3">
+            <i class="fa-solid fa-file-pen text-emerald-600 text-base"></i>
+            <span>Modul Ajar Generator</span>
+          </span>
+          <span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded">NEW</span>
+        </button>
+        <button onclick="switchTab('ai-generator')" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition">
+          <i class="fa-solid fa-wand-magic-sparkles text-blue-600 text-base"></i>
+          <span>AI Draft Prompt</span>
+        </button>
+        <button onclick="switchTab('profile')" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-school text-indigo-600 text-base"></i>
+          <span>Profil & Data Sekolah</span>
+        </button>
+        <button onclick="switchTab('journal')" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition">
+          <i class="fa-solid fa-book-open text-amber-500 text-base"></i>
+          <span>Jurnal Mengajar</span>
+        </button>
+        <button onclick="switchTab('grades')" class="tab-btn w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition">
+          <i class="fa-solid fa-list-check text-purple-600 text-base"></i>
+          <span>Rekap Nilai & LKPD</span>
+        </button>
+      </nav>
+
+      <div class="mt-6 p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-800">
+        <p class="font-bold flex items-center gap-1.5 mb-1">
+          <i class="fa-solid fa-circle-info text-blue-600"></i> Info Sistem
+        </p>
+        <p class="text-[11px] leading-relaxed text-blue-700">Profil & Logo tersimpan aman secara lokal di browser Anda. Modul Ajar dapat dicetak PDF atau di-copy secara langsung.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="lg:col-span-3 space-y-6">
+
+      <!-- TAB 1: MODUL AJAR GENERATOR -->
+      <section id="tab-modul-generator" class="tab-content bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-slate-100 pb-4 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-file-pen text-emerald-600"></i> Generator Modul Ajar Kurikulum Merdeka
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">Susun Modul Ajar terstruktur lengkap dengan LKPD dan Rubrik Penilaian siap cetak.</p>
+          </div>
+          <button onclick="loadPresetIPA()" class="bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-semibold px-3 py-2 rounded-xl border border-amber-200 transition flex items-center gap-1.5 self-start sm:self-auto">
+            <i class="fa-solid fa-bolt text-amber-600"></i> Load Preset IPA Kelas 7
+          </button>
+        </div>
+
+        <form id="modul-generator-form" class="space-y-4 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-200/70">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Topik / Materi Pembelajaran</label>
+              <input type="text" id="gen-topic" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: Suhu, Kalor dan Pemuaian">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Sasaran / Kelas & Fase</label>
+              <select id="gen-grade" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <option value="Kelas 7 (Fase D)">Kelas 7 (Fase D)</option>
+                <option value="Kelas 8 (Fase D)">Kelas 8 (Fase D)</option>
+                <option value="Kelas 9 (Fase D)">Kelas 9 (Fase D)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Alokasi Waktu</label>
+              <input type="text" id="gen-time" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="2 x 40 Menit (1 Pertemuan)">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Model Pembelajaran</label>
+              <select id="gen-model" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none">
+                <option value="Problem-Based Learning (PBL)">Problem-Based Learning (PBL)</option>
+                <option value="Project-Based Learning (PjBL)">Project-Based Learning (PjBL)</option>
+                <option value="Inquiry Learning">Inquiry Learning</option>
+                <option value="Discovery Learning">Discovery Learning</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Elemen Capaian Pembelajaran (CP)</label>
+              <input type="text" id="gen-cp" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Pemahaman IPA & Keterampilan Proses">
+            </div>
+          </div>
+
+          <button type="button" onclick="generateModulAjar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-gears"></i> Generate Dokumen Modul Ajar Complete
+          </button>
+        </form>
+
+        <!-- Preview Document Box -->
+        <div class="border border-slate-300 rounded-2xl p-4 md:p-8 bg-white shadow-inner" id="preview-wrapper">
+          <div class="flex justify-between items-center mb-4 pb-3 border-b no-print">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-eye text-slate-400"></i> Pratinjau Dokumen Siap Cetak
+            </span>
+            <div class="flex items-center gap-2">
+              <button onclick="copyModulHTML()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                <i class="fa-solid fa-copy"></i> Salin Teks
+              </button>
+              <button onclick="window.print()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow transition flex items-center gap-1">
+                <i class="fa-solid fa-print"></i> Cetak / Save PDF
+              </button>
+            </div>
+          </div>
+
+          <!-- Target Printable Content -->
+          <div id="print-area" class="prose max-w-none text-slate-900 leading-relaxed text-sm">
+            <p class="text-center text-slate-400 italic text-xs py-12">Klik tombol "Generate Dokumen Modul Ajar Complete" di atas untuk memuat dokumen lengkap.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI DRAFT PROMPT GENERATOR -->
+      <section id="tab-ai-generator" class="tab-content hidden bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80">
+        <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-blue-600"></i> AI Generator Draft Prompt Perangkat Ajar
+        </h2>
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Dokumen</label>
+              <select id="ai-doc-type" class="w-full border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Modul Ajar Lengkap">Modul Ajar Lengkap</option>
+                <option value="Alur Tujuan Pembelajaran (ATP)">Alur Tujuan Pembelajaran (ATP)</option>
+                <option value="Lembar Kerja Peserta Didik (LKPD)">Lembar Kerja Peserta Didik (LKPD)</option>
+                <option value="Bank Soal & Rubrik Penilaian">Bank Soal & Rubrik Penilaian</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Kelas / Fase</label>
+              <select id="ai-grade" class="w-full border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Kelas 7 (Fase D)">Kelas 7 (Fase D)</option>
+                <option value="Kelas 8 (Fase D)">Kelas 8 (Fase D)</option>
+                <option value="Kelas 9 (Fase D)">Kelas 9 (Fase D)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Materi Pokok / Topik</label>
+              <input type="text" id="ai-topic" class="w-full border rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Suhu, Kalor, dan Pemuaian">
+            </div>
+          </div>
+          <button onclick="generatePromptPreview()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl text-xs shadow transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-bolt"></i> Generate Draft Prompt AI
+          </button>
+          
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Hasil Prompt Siap Pakai (Salin ke ChatGPT / Gemini / Claude):</label>
+            <textarea id="ai-output-prompt" rows="8" class="w-full border bg-slate-50 rounded-xl p-3 text-xs font-mono outline-none text-slate-700" readonly></textarea>
+            <button onclick="copyPrompt()" class="mt-2 text-xs text-blue-600 hover:underline font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-copy"></i> Salin Prompt ke Clipboard
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: PROFIL GURU & SEKOLAH -->
+      <section id="tab-profile" class="tab-content hidden bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80">
+        <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-indigo-600"></i> Pengaturan Profil Sekolah & Guru
+        </h2>
+        <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Upload Logo Sekolah -->
+          <div class="md:col-span-2 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-center gap-4">
+            <div class="w-20 h-20 bg-white border border-slate-300 rounded-xl flex items-center justify-center overflow-hidden shadow-inner shrink-0">
+              <img id="logo-preview-img" src="" alt="Preview Logo" class="hidden w-full h-full object-contain">
+              <i id="logo-preview-placeholder" class="fa-solid fa-school text-3xl text-slate-300"></i>
+            </div>
+            <div class="flex-1 w-full text-center md:text-left">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Unggah Logo / Gambar Identitas Sekolah (PNG/JPG)</label>
+              <input type="file" id="input-logo-file" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+              <p class="text-[11px] text-slate-400 mt-1">Logo akan ditampilkan pada Kop Surat Modul Ajar dan Header Aplikasi.</p>
+            </div>
+            <button type="button" id="btn-remove-logo" onclick="removeLogo()" class="hidden px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-semibold transition border border-red-200">
+              <i class="fa-solid fa-trash-can mr-1"></i> Hapus Logo
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Satuan Pendidikan</label>
+            <input type="text" id="input-school" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Contoh: SMPN 8 MATARAM">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">NPSN</label>
+            <input type="text" id="input-npsn" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="50201234">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Guru Penyusun</label>
+            <input type="text" id="input-teacher" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="NUNIK, S.Pd.">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Guru</label>
+            <input type="text" id="input-nip" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="19880512 201503 2 004">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelajaran</label>
+            <input type="text" id="input-subject" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="IPA">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Ajaran & Semester</label>
+            <input type="text" id="input-academic-year" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2026/2027 - Ganjil">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kepala Sekolah</label>
+            <input type="text" id="input-headmaster" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="H. AHMAD, M.Pd.">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Kepala Sekolah</label>
+            <input type="text" id="input-headmaster-nip" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 text-xs focus:ring-2 focus:ring-blue-500 outline-none" placeholder="19720315 199802 1 001">
+          </div>
+
+          <div class="md:col-span-2 text-right mt-2">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow transition">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Profil & Logo
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- TAB 4: JURNAL MENGAJAR -->
+      <section id="tab-journal" class="tab-content hidden bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80">
+        <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-book-open text-amber-500"></i> Jurnal Mengajar Harian
+        </h2>
+        <p class="text-xs text-slate-600 mb-4">Catatan ringkas aktivitas pembelajaran harian guru.</p>
+        <div class="border rounded-xl overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-700 font-bold">
+              <tr>
+                <th class="p-3">Tanggal</th>
+                <th class="p-3">Kelas</th>
+                <th class="p-3">Materi Pembelajaran</th>
+                <th class="p-3">Kehadiran Siswa</th>
+                <th class="p-3">Catatan / Kendala</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y text-slate-600">
+              <tr>
+                <td class="p-3">12 Nov 2026</td>
+                <td class="p-3 font-semibold text-slate-800">7A</td>
+                <td class="p-3">Suhu, Kalor dan Pemuaian (PBL)</td>
+                <td class="p-3 text-emerald-600 font-semibold">Hadir: 31, S: 1, I: 0</td>
+                <td class="p-3">Praktikum balon mengembang berjalan sangat kondusif.</td>
+              </tr>
+              <tr>
+                <td class="p-3">11 Nov 2026</td>
+                <td class="p-3 font-semibold text-slate-800">7B</td>
+                <td class="p-3">Konversi Skala Termometer</td>
+                <td class="p-3 text-emerald-600 font-semibold">Hadir: 32, S: 0, I: 0</td>
+                <td class="p-3">Beberapa siswa perlu bimbingan matematika dasar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 5: REKAP NILAI -->
+      <section id="tab-grades" class="tab-content hidden bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80">
+        <h2 class="text-lg font-bold text-slate-800 border-b pb-2 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-purple-600"></i> Rekapitulasi Nilai & LKPD
+        </h2>
+        <p class="text-xs text-slate-600 mb-4">Manajemen rekapitulasi asesmen formatif dan sumatif siswa.</p>
+        <div class="p-4 bg-purple-50 border border-purple-100 rounded-xl text-xs text-purple-800">
+          <i class="fa-solid fa-circle-check text-purple-600 mr-1"></i> Seluruh data asesmen dari modul ajar terhubung secara langsung.
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-100', 'text-blue-700', 'font-bold');
+      });
+
+      const targetTab = document.getElementById('tab-' + tabId);
+      if (targetTab) {
+        targetTab.classList.remove('hidden');
+      }
+    }
+
+    // Default Profile Data
+    const defaultProfile = {
+      school: 'SMPN 8 MATARAM',
+      npsn: '50201234',
+      teacher: 'NUNIK, S.Pd.',
+      nip: '19880512 201503 2 004',
+      subject: 'IPA',
+      year: '2026/2027 - Ganjil',
+      headmaster: 'H. AHMAD, M.Pd.',
+      headmasterNip: '19720315 199802 1 001',
+      logo: ''
+    };
+
+    // Upload & Handle Base64 Logo Image
+    let currentLogoBase64 = '';
+
+    document.getElementById('input-logo-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+          alert('Ukuran berkas terlalu besar! Maksimal 2MB.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          currentLogoBase64 = event.target.result;
+          displayLogo(currentLogoBase64);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function displayLogo(base64Data) {
+      const previewImg = document.getElementById('logo-preview-img');
+      const previewPlaceholder = document.getElementById('logo-preview-placeholder');
+      const headerImg = document.getElementById('header-logo-img');
+      const headerIcon = document.getElementById('header-logo-icon');
+      const btnRemove = document.getElementById('btn-remove-logo');
+
+      if (base64Data) {
+        previewImg.src = base64Data;
+        previewImg.classList.remove('hidden');
+        previewPlaceholder.classList.add('hidden');
+
+        headerImg.src = base64Data;
+        headerImg.classList.remove('hidden');
+        headerIcon.classList.add('hidden');
+
+        btnRemove.classList.remove('hidden');
+      } else {
+        previewImg.src = '';
+        previewImg.classList.add('hidden');
+        previewPlaceholder.classList.remove('hidden');
+
+        headerImg.src = '';
+        headerImg.classList.add('hidden');
+        headerIcon.classList.remove('hidden');
+
+        btnRemove.classList.add('hidden');
+      }
+    }
+
+    function removeLogo() {
+      currentLogoBase64 = '';
+      document.getElementById('input-logo-file').value = '';
+      displayLogo('');
+    }
+
+    // Save & Load LocalStorage Profile
+    const profileForm = document.getElementById('profile-form');
+    profileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const profileData = {
+        school: document.getElementById('input-school').value || defaultProfile.school,
+        npsn: document.getElementById('input-npsn').value || defaultProfile.npsn,
+        teacher: document.getElementById('input-teacher').value || defaultProfile.teacher,
+        nip: document.getElementById('input-nip').value || defaultProfile.nip,
+        subject: document.getElementById('input-subject').value || defaultProfile.subject,
+        year: document.getElementById('input-academic-year').value || defaultProfile.year,
+        headmaster: document.getElementById('input-headmaster').value || defaultProfile.headmaster,
+        headmasterNip: document.getElementById('input-headmaster-nip').value || defaultProfile.headmasterNip,
+        logo: currentLogoBase64
+      };
+      localStorage.setItem('siapguru_profile', JSON.stringify(profileData));
+      updateUIHeader(profileData);
+      alert('Data profil sekolah, logo, dan guru berhasil disimpan!');
+    });
+
+    function loadProfile() {
+      const saved = localStorage.getItem('siapguru_profile');
+      const data = saved ? JSON.parse(saved) : defaultProfile;
+      
+      document.getElementById('input-school').value = data.school || '';
+      document.getElementById('input-npsn').value = data.npsn || '';
+      document.getElementById('input-teacher').value = data.teacher || '';
+      document.getElementById('input-nip').value = data.nip || '';
+      document.getElementById('input-subject').value = data.subject || '';
+      document.getElementById('input-academic-year').value = data.year || '';
+      document.getElementById('input-headmaster').value = data.headmaster || '';
+      document.getElementById('input-headmaster-nip').value = data.headmasterNip || '';
+      
+      currentLogoBase64 = data.logo || '';
+      displayLogo(currentLogoBase64);
+
+      updateUIHeader(data);
+      return data;
+    }
+
+    function updateUIHeader(data) {
+      if(data.school) document.getElementById('header-school').innerText = data.school;
+      if(data.teacher) document.getElementById('header-teacher').innerText = data.teacher;
+      if(data.subject) document.getElementById('header-subject').innerText = 'Mata Pelajaran: ' + data.subject;
+    }
+
+    // Load Preset IPA
+    function loadPresetIPA() {
+      document.getElementById('gen-topic').value = "Suhu, Kalor, dan Pemuaian";
+      document.getElementById('gen-grade').value = "Kelas 7 (Fase D)";
+      document.getElementById('gen-time').value = "2 x 40 Menit (1 Pertemuan)";
+      document.getElementById('gen-model').value = "Problem-Based Learning (PBL)";
+      document.getElementById('gen-cp').value = "Peserta didik mampu mengukur besaran suhu, memahami konsep kalor, serta menganalisis fenomena pemuaian zat dalam kehidupan sehari-hari.";
+      generateModulAjar();
+    }
+
+    // Modul Ajar Generator Engine
+    function generateModulAjar() {
+      const prof = loadProfile();
+      const topic = document.getElementById('gen-topic').value || "Suhu, Kalor, dan Pemuaian";
+      const grade = document.getElementById('gen-grade').value || "Kelas 7 (Fase D)";
+      const time = document.getElementById('gen-time').value || "2 x 40 Menit";
+      const model = document.getElementById('gen-model').value || "Problem-Based Learning (PBL)";
+      const cp = document.getElementById('gen-cp').value || "Peserta didik mampu memahami konsep suhu, kalor, dan pemuaian zat.";
+
+      const logoHTML = prof.logo ? `<img src="${prof.logo}" class="w-16 h-16 object-contain" alt="Logo Sekolah">` : '';
+
+      const modulHTML = `
+        <div class="flex items-center justify-center gap-4 border-b-2 border-slate-900 pb-4 mb-6 text-center">
+          ${logoHTML}
+          <div>
+            <h1 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">MODUL AJAR KURIKULUM MERDEKA</h1>
+            <h2 class="text-base font-bold text-slate-800 uppercase mt-0.5">MATA PELAJARAN: ${prof.subject.toUpperCase()}</h2>
+            <p class="text-xs text-slate-600 mt-0.5">${prof.school} | Tahun Ajaran ${prof.year}</p>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-bold bg-slate-100 p-2 rounded-md border-l-4 border-slate-800 mb-3">I. INFORMASI UMUM</h3>
+        <table class="w-full text-xs border-collapse border border-slate-300 mb-6">
+          <tbody>
+            <tr><td class="border p-2 font-bold w-1/3 bg-slate-50">Nama Penyusun</td><td class="border p-2">${prof.teacher}</td></tr>
+            <tr><td class="border p-2 font-bold bg-slate-50">Satuan Pendidikan</td><td class="border p-2">${prof.school} (NPSN: ${prof.npsn})</td></tr>
+            <tr><td class="border p-2 font-bold bg-slate-50">Fase / Kelas / Semester</td><td class="border p-2">${grade} / Ganjil</td></tr>
+            <tr><td class="border p-2 font-bold bg-slate-50">Materi Pokok / Topik</td><td class="border p-2 font-semibold text-blue-900">${topic}</td></tr>
+            <tr><td class="border p-2 font-bold bg-slate-50">Alokasi Waktu</td><td class="border p-2">${time}</td></tr>
+            <tr><td class="border p-2 font-bold bg-slate-50">Model & Metode Pembelajaran</td><td class="border p-2">${model} (Diskusi, Eksperimen Sederhana, Presentasi)</td></tr>
+            <tr><td class="border p-2 font-bold bg-slate-50">Profil Pelajar Pancasila</td><td class="border p-2">Bernalar Kritis, Gotong Royong, Kreatif</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="text-sm font-bold bg-slate-100 p-2 rounded-md border-l-4 border-slate-800 mb-3">II. KOMPONEN INTI</h3>
+        
+        <div class="mb-4">
+          <p class="font-bold text-xs text-slate-800 mb-1">A. Capaian Pembelajaran (CP):</p>
+          <p class="text-xs text-slate-700 bg-slate-50 p-2.5 rounded border border-slate-200">${cp}</p>
+        </div>
+
+        <div class="mb-4">
+          <p class="font-bold text-xs text-slate-800 mb-1">B. Tujuan Pembelajaran (TP):</p>
+          <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1">
+            <li>Peserta didik dapat membedakan konsep suhu dan kalor berdasarkan hasil eksperimen secara tepat.</li>
+            <li>Peserta didik dapat menganalisis dampak pemuaian zat (padat, cair, gas) dalam kehidupan sehari-hari secara kritis.</li>
+            <li>Peserta didik dapat menyelesaikan perhitungan kalor sederhana melalui diskusi kelompok.</li>
+          </ol>
+        </div>
+
+        <div class="mb-4">
+          <p class="font-bold text-xs text-slate-800 mb-1">C. Pemahaman Bermakna:</p>
+          <p class="text-xs text-slate-700 bg-amber-50 p-2.5 rounded border border-amber-200">
+            Perubahan suhu dan perpindahan kalor mempengaruhi wujud dan ukuran benda. Pemuaian zat dapat dimanfaatkan dalam teknologi (seperti termometer bimetal) sekaligus dapat menimbulkan masalah konstruksi (rel kereta api atau kaca jendela) sehingga memerlukan antisipasi yang tepat.
+          </p>
+        </div>
+
+        <div class="mb-6">
+          <p class="font-bold text-xs text-slate-800 mb-1">D. Pertanyaan Pemantik:</p>
+          <ul class="list-disc list-inside text-xs text-slate-700 space-y-1">
+            <li>Mengapa gelas kaca yang tebal bisa pecah saat dituangkan air mendidih?</li>
+            <li>Mengapa kabel listrik di sepanjang jalan dipasang agak kendur di siang hari?</li>
+            <li>Apakah rasa panas atau dingin yang kita rasakan dengan kulit bisa dijadikan patokan suhu yang pasti?</li>
+          </ul>
+        </div>
+
+        <h3 class="text-sm font-bold bg-slate-100 p-2 rounded-md border-l-4 border-slate-800 mb-3">III. KEGIATAN PEMBELAJARAN</h3>
+        
+        <div class="space-y-3 text-xs text-slate-700 mb-6">
+          <div class="border p-3 rounded-lg">
+            <p class="font-bold text-slate-800 border-b pb-1 mb-2">1. Pendahuluan (10 Menit)</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Guru menyapa peserta didik, berdoa, dan melakukan presensi kehadiran.</li>
+              <li>Apersepsi: Menyentuh dua wadah berisi air hangat dan air es untuk merasakan perbedaan suhu.</li>
+              <li>Guru menyampaikan Tujuan Pembelajaran dan skema penilaian.</li>
+            </ul>
+          </div>
+
+          <div class="border p-3 rounded-lg bg-slate-50">
+            <p class="font-bold text-slate-800 border-b pb-1 mb-2">2. Kegiatan Inti (${model}) - 60 Menit</p>
+            <ul class="list-disc list-inside space-y-1.5">
+              <li><b>Orientasi Masalah:</b> Menayangkan gambar celah rel kereta api dan balon botol yang mengembang saat dipanaskan.</li>
+              <li><b>Pengorganisasian Kelompok:</b> Siswa dibagi menjadi kelompok heterogen (4-5 siswa) dan menerima LKPD.</li>
+              <li><b>Penyelidikan Terbimbing:</b> Kelompok melakukan simulasi pengamatan pemuaian gas pada botol dan balon karet.</li>
+              <li><b>Penyajian Hasil:</b> Setiap kelompok mendiskusikan hasil pengamatan dan mempresentasikannya di depan kelas.</li>
+              <li><b>Evaluasi & Penguatan:</b> Guru memberikan klarifikasi dan penguatan konsep Suhu, Kalor, dan Pemuaian.</li>
+            </ul>
+          </div>
+
+          <div class="border p-3 rounded-lg">
+            <p class="font-bold text-slate-800 border-b pb-1 mb-2">3. Penutup (10 Menit)</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Peserta didik menyimpulkan pembelajaran bersama guru.</li>
+              <li>Refleksi singkat dan apresiasi atas partisipasi seluruh kelompok.</li>
+              <li>Doa dan penutup.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-bold bg-slate-100 p-2 rounded-md border-l-4 border-slate-800 mb-3">IV. LEMBAR KERJA PESERTA DIDIK (LKPD)</h3>
+        <div class="border-2 border-dashed border-slate-400 p-4 rounded-xl mb-8 bg-slate-50">
+          <p class="text-center font-bold text-sm uppercase mb-2">LEMBAR KERJA PESERTA DIDIK (LKPD): PENYELIDIKAN PEMUAIAN</p>
+          <p class="text-xs mb-3"><b>Nama Kelompok:</b> .................................... | <b>Kelas:</b> VII</p>
+          
+          <p class="font-bold text-xs mb-1">Langkah Kerja Sederhana:</p>
+          <ol class="list-decimal list-inside text-xs mb-3 space-y-1">
+            <li>Pasang balon karet pada mulut botol kaca kosong.</li>
+            <li>Celupkan bagian bawah botol ke dalam air panas, amati balon selama 2 menit.</li>
+            <li>Pindahkan botol ke dalam air es, amati perubahan balon.</li>
+          </ol>
+
+          <table class="w-full text-xs border-collapse border border-slate-300 mb-3 bg-white">
+            <thead>
+              <tr class="bg-slate-200">
+                <th class="border p-2 text-left">Perlakuan Botol</th>
+                <th class="border p-2 text-left">Kondisi Balon Karet</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="border p-2">Dimasukkan Air Panas</td><td class="border p-2"></td></tr>
+              <tr><td class="border p-2">Dimasukkan Air Es</td><td class="border p-2"></td></tr>
+            </tbody>
+          </table>
+
+          <p class="font-bold text-xs mb-1">Pertanyaan Diskusi:</p>
+          <p class="text-xs mb-2">1. Mengapa balon karet mengembang saat botol ditaruh di air panas?<br><i>Jawab: ....................................................................................................................</i></p>
+          <p class="text-xs">2. Tuliskan 2 contoh peristiwa pemuaian zat dalam kehidupan sehari-hari!<br><i>Jawab: ....................................................................................................................</i></p>
+        </div>
+
+        <!-- Signature Section -->
+        <div class="mt-8 pt-4 flex justify-between text-xs text-center border-t border-slate-300">
+          <div>
+            <p>Mengetahui,</p>
+            <p class="font-bold mb-12">Kepala ${prof.school}</p>
+            <p class="font-bold underline">${prof.headmaster}</p>
+            <p>NIP. ${prof.headmasterNip}</p>
+          </div>
+          <div>
+            <p>Mataram, 12 November 2026</p>
+            <p class="font-bold mb-12">Guru Mata Pelajaran IPA</p>
+            <p class="font-bold underline">${prof.teacher}</p>
+            <p>NIP. ${prof.nip}</p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('print-area').innerHTML = modulHTML;
+    }
+
+    // AI Prompt Generator Helper
+    function generatePromptPreview() {
+      const saved = loadProfile();
+      const docType = document.getElementById('ai-doc-type').value;
+      const grade = document.getElementById('ai-grade').value;
+      const topic = document.getElementById('ai-topic').value || 'Suhu, Kalor, dan Pemuaian';
+
+      const promptText = `Bertindaklah sebagai Penyusun Kurikulum Profesional. Buatkan ${docType} Kurikulum Merdeka untuk:
+- Mata Pelajaran: ${saved.subject || 'IPA'}
+- Sasaran: ${grade}
+- Topik/Materi: ${topic}
+- Satuan Pendidikan: ${saved.school || 'SMPN 8 MATARAM'}
+- Penyusun: ${saved.teacher || 'NUNIK, S.Pd.'}
+
+Sertakan komponen lengkap sesuai standar Kurikulum Merdeka (Tujuan Pembelajaran, Pemahaman Bermakna, Pertanyaan Pemantik, Kegiatan Pendahuluan-Inti-Penutup, LKPD, dan Rubrik Penilaian). Format output rapi dan siap dicetak.`;
+
+      document.getElementById('ai-output-prompt').value = promptText;
+    }
+
+    function copyPrompt() {
+      const copyText = document.getElementById('ai-output-prompt');
+      if (!copyText.value) return;
+      copyText.select();
+      document.execCommand('copy');
+      alert('Prompt berhasil disalin ke clipboard!');
+    }
+
+    function copyModulHTML() {
+      const printArea = document.getElementById('print-area');
+      const range = document.createRange();
+      range.selectNode(printArea);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      alert('Teks Modul Ajar berhasil disalin!');
+    }
+
+    // Initialize application on window load
+    window.onload = function() {
+      loadProfile();
+      loadPresetIPA();
+    };
+  </script>
+</body>
+</html>
